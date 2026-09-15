@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=yes">
+<meta name="theme-color" content="#0a7d4f">
+<meta name="color-scheme" content="light">
+<meta name="application-name" content="Forever CIV">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Forever CIV">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="format-detection" content="telephone=no">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
+<title>Simulateur Forever CIV</title>
+<style>
+:root{--bg:#f4f7f5;--card:#fff;--text:#18211d;--muted:#6a766f;--line:#dde5e0;--accent:#0a7d4f;--accent2:#e8f5ee;--warn:#9a5b00;--danger:#a23b3b;--shadow:0 8px 28px rgba(20,45,32,.08)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{background:var(--bg);min-height:100%;-webkit-text-size-adjust:100%}
+body{margin:0;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--text);font-size:16px;min-height:100vh;padding-top:env(safe-area-inset-top)}
+button,input,textarea{font:inherit}
+button{touch-action:manipulation;cursor:pointer}
+.app{max-width:780px;margin:0 auto;padding:14px 12px calc(108px + env(safe-area-inset-bottom))}
+.headrow{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+h1{font-size:1.35rem;margin:4px 0 2px;line-height:1.2}
+.sub{color:var(--muted);font-size:.88rem;margin-bottom:8px;line-height:1.45}
+.statusrow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:6px 0 12px}
+.status{font-size:.72rem;padding:5px 8px;border-radius:999px;background:#eef2ef;color:var(--muted);font-weight:800}
+.status.online{background:var(--accent2);color:var(--accent)}
+.install{min-height:42px;border:1px solid #cfe9da;background:var(--accent2);color:var(--accent);border-radius:12px;padding:0 12px;font-weight:800;white-space:nowrap}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px;margin:10px 0;box-shadow:var(--shadow)}
+.label{display:block;font-size:.8rem;color:var(--muted);font-weight:700;margin-bottom:7px}
+.tiers{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.tier{min-height:46px;border:1px solid var(--line);background:#fff;border-radius:12px;font-weight:800;font-size:.9rem;color:var(--text)}
+.tier.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.searchrow{display:grid;grid-template-columns:1fr;gap:8px}
+input[type=search]{width:100%;min-height:50px;border:1px solid var(--line);border-radius:12px;padding:0 14px;font-size:16px;outline:none;-webkit-appearance:none;appearance:none;background:#fff;color:var(--text)}
+input[type=search]:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent2)}
+.results{margin-top:8px;max-height:330px;overflow:auto;-webkit-overflow-scrolling:touch;border-top:1px solid var(--line)}
+.result{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;padding:11px 2px;border-bottom:1px solid var(--line)}
+.pname{font-weight:800;font-size:.92rem;overflow-wrap:anywhere}
+.meta{font-size:.76rem;color:var(--muted);margin-top:3px;line-height:1.35}
+.price{font-size:.82rem;font-weight:800;color:var(--accent);margin-top:3px}
+.missing{color:var(--warn)}
+.add{min-width:80px;min-height:44px;border:0;border-radius:11px;background:var(--accent2);color:var(--accent);font-weight:800}
+.add:disabled{opacity:.45;color:var(--muted)}
+.sectiontitle{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:6px}
+.sectiontitle h2{font-size:1rem;margin:0}
+.linkbtn{min-height:44px;border:0;background:transparent;color:var(--accent);font-weight:800;padding:8px}
+.empty{padding:24px 8px;text-align:center;color:var(--muted);font-size:.9rem}
+.lineitem{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;padding:11px 0;border-bottom:1px solid var(--line)}
+.lineitem:last-child{border-bottom:0}
+.qtyrow{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin-top:8px}
+.qtybtn{width:44px;height:44px;border:1px solid var(--line);border-radius:10px;background:#fff;font-size:1.15rem;font-weight:800}
+.qty{min-width:36px;text-align:center;font-weight:900}
+.del{min-height:40px;border:0;background:transparent;color:var(--danger);font-size:.8rem;font-weight:800;padding:7px}
+.lineamount{text-align:right;font-weight:900;white-space:nowrap}
+.linecc{color:var(--muted);font-size:.76rem;text-align:right;margin-top:4px}
+.summary{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.metric{background:#f7faf8;border:1px solid var(--line);border-radius:13px;padding:10px}
+.metric span{display:block;color:var(--muted);font-size:.73rem}
+.metric strong{display:block;margin-top:4px;font-size:1.05rem}
+.metric.primary{grid-column:1/-1;background:var(--accent2);border-color:#cfe9da}
+.metric.primary strong{font-size:1.45rem;color:var(--accent)}
+.compare{display:grid;grid-template-columns:1fr auto;gap:7px 12px;font-size:.88rem}
+.compare div{padding:6px 0;border-bottom:1px dashed var(--line)}
+.compare .val{text-align:right;font-weight:900}
+details summary{cursor:pointer;font-weight:800;color:var(--accent);padding:8px 0}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.action{min-height:46px;border-radius:12px;border:1px solid var(--line);background:#fff;font-weight:800;color:var(--text)}
+.action.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+#shareText{width:100%;min-height:140px;margin-top:10px;border:1px solid var(--line);border-radius:12px;padding:10px;font-size:16px;display:none;background:#fff;color:var(--text)}
+.note{font-size:.76rem;color:var(--muted);line-height:1.45;margin:9px 2px 0}
+.fixedtotal{position:fixed;z-index:30;left:0;right:0;bottom:0;background:rgba(255,255,255,.96);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border-top:1px solid var(--line);padding:9px 12px calc(9px + env(safe-area-inset-bottom))}
+.fixedinner{max-width:780px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.fixedinner small{display:block;color:var(--muted)}
+.fixedinner strong{font-size:1.2rem;color:var(--accent)}
+.toast{position:fixed;z-index:80;left:50%;bottom:calc(86px + env(safe-area-inset-bottom));transform:translateX(-50%);max-width:90vw;background:#18211d;color:#fff;padding:10px 14px;border-radius:12px;font-size:.85rem;box-shadow:var(--shadow);display:none;text-align:center}
+.modalback{position:fixed;z-index:90;inset:0;background:rgba(0,0,0,.38);display:none;padding:20px;align-items:flex-end;justify-content:center}
+.modal{width:min(100%,520px);background:#fff;border-radius:18px;padding:18px;box-shadow:0 18px 60px rgba(0,0,0,.25);margin-bottom:env(safe-area-inset-bottom)}
+.modal h3{margin:0 0 8px;font-size:1.05rem}
+.modal p{margin:7px 0;color:var(--muted);line-height:1.5;font-size:.9rem}
+.modal .close{width:100%;min-height:46px;margin-top:12px;border:0;border-radius:12px;background:var(--accent);color:#fff;font-weight:800}
+@media(min-width:640px){.app{padding:20px 18px 105px}.tiers{grid-template-columns:repeat(6,1fr)}}
+@media(max-width:420px){.headrow{align-items:center}h1{font-size:1.25rem}.lineitem{grid-template-columns:1fr}.lineamount,.linecc{text-align:left}}
+@media print{body{background:#fff}.fixedtotal,.searchcard,.actions,.linkbtn,.tiers,.install,.statusrow{display:none!important}.card{box-shadow:none}.app{padding-bottom:0}}
+</style>
+</head>
+<body>
+<main class="app">
+  <div class="headrow">
+    <div><h1>Simulateur Forever CIV</h1><div class="sub">Simulation rapide des commandes • Prix de vente, PC, AA, A, MA, M • Total CC</div></div>
+    <button id="installBtn" class="install" type="button">Installer</button>
+  </div>
+  <div class="statusrow"><span id="netStatus" class="status">Connexion…</span><span class="status">PWA Android + iPhone</span></div>
+
+  <section class="card">
+    <span class="label">Tarif appliqué au panier</span>
+    <div class="tiers" id="tiers">
+      <button type="button" class="tier" data-tier="sale">Vente</button>
+      <button type="button" class="tier" data-tier="pc">PC</button>
+      <button type="button" class="tier" data-tier="aa">AA</button>
+      <button type="button" class="tier" data-tier="a">A</button>
+      <button type="button" class="tier" data-tier="ma">MA</button>
+      <button type="button" class="tier" data-tier="m">M</button>
+    </div>
+  </section>
+
+  <section class="card searchcard">
+    <label class="label" for="search">Ajouter un produit</label>
+    <div class="searchrow"><input id="search" type="search" placeholder="Nom ou référence (ex. 815, Pulpe, Argi+)" autocomplete="off" autocapitalize="none" spellcheck="false"></div>
+    <div class="results" id="results"></div>
+  </section>
+
+  <section class="card">
+    <div class="sectiontitle"><h2>Panier</h2><button id="clear" class="linkbtn" type="button">Vider</button></div>
+    <div id="cart"></div>
+  </section>
+
+  <section class="card">
+    <div class="summary">
+      <div class="metric primary"><span>Total à payer</span><strong id="total">0 FCFA</strong></div>
+      <div class="metric"><span>Total CC</span><strong id="cc">0,000</strong></div>
+      <div class="metric"><span>Articles</span><strong id="count">0</strong></div>
+    </div>
+    <details style="margin-top:10px"><summary>Comparer le même panier aux 6 tarifs</summary><div class="compare" id="compare"></div></details>
+    <div class="actions">
+      <button id="recap" class="action" type="button">Récapitulatif</button>
+      <button id="share" class="action primary" type="button">Partager</button>
+      <button id="print" class="action" type="button">Imprimer / PDF</button>
+      <button id="copy" class="action" type="button">Copier</button>
+    </div>
+    <textarea id="shareText" readonly aria-label="Récapitulatif de la simulation"></textarea>
+    <p class="note">Les montants proviennent de la liste CIV fournie. « PC » reprend « Tarif PC TTC » et « AA » reprend « Tarif FBO TTC ». Forever Bakuchiol (réf. 687) est conservé sans prix renseigné.</p>
+  </section>
+</main>
+<div class="fixedtotal"><div class="fixedinner"><div><small id="fixedTier">Tarif AA</small><strong id="fixedTotal">0 FCFA</strong></div><div style="text-align:right"><small>Total CC</small><strong id="fixedCc">0,000</strong></div></div></div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<div id="installModal" class="modalback" role="dialog" aria-modal="true" aria-labelledby="installTitle"><div class="modal"><h3 id="installTitle">Installer Forever CIV</h3><div id="installHelp"></div><button id="closeModal" type="button" class="close">Fermer</button></div></div>
+
+<script>
+(function(){
+'use strict';
+var PRODUCTS=[{"ref":"815","name":"PULPE D'ALOES","cat":"Buvable","cc":0.1,"sale":22000,"pc":20384,"aa":15009,"a":13640,"ma":12540,"m":11440},{"ref":"834","name":"ALOE BERRY NECTAR","cat":"Buvable","cc":0.1,"sale":22000,"pc":20384,"aa":15009,"a":13640,"ma":12540,"m":11440},{"ref":"77","name":"COEUR D'ALOES","cat":"Buvable","cc":0.1,"sale":22000,"pc":20384,"aa":15009,"a":13640,"ma":12540,"m":11440},{"ref":"196","name":"FOREVER FREEDOM","cat":"Buvable","cc":0.146,"sale":32000,"pc":29781,"aa":21915,"a":19840,"ma":18240,"m":16640},{"ref":"200","name":"INFUSION FLEUR ALOES","cat":"Buvable","cc":0.07,"sale":15500,"pc":14281,"aa":10512,"a":9610,"ma":8835,"m":8060},{"ref":"716","name":"PULPE D'ALOES 33 ML","cat":"Buvable","cc":0.03,"sale":7000,"pc":6304,"aa":4646,"a":4340,"ma":3990,"m":3640},{"ref":"721","name":"FOREVER FAB","cat":"Buvable","cc":0.019,"sale":5500,"pc":4294,"aa":3164,"a":2802,"ma":2576,"m":2350},{"ref":"456","name":"VITAL5- GEL","cat":"Combo Packs","cc":1.029,"sale":223000,"pc":209802,"aa":154434,"a":138260,"ma":127110,"m":115960},{"ref":"457","name":"VITAL 5-BERRY NECTAR","cat":"Combo Packs","cc":1.029,"sale":223000,"pc":209802,"aa":154434,"a":138260,"ma":127110,"m":115960},{"ref":"458","name":"VITAL-5 BITS N PEACHES","cat":"Combo Packs","cc":1.029,"sale":223000,"pc":209802,"aa":154434,"a":138260,"ma":127110,"m":115960},{"ref":"459","name":"VITAL 5- FREEDOM","cat":"Combo Packs","cc":1.209,"sale":262000,"pc":246511,"aa":181449,"a":162440,"ma":149340,"m":136240},{"ref":"528","name":"BEGINNER 1&2 VANILLA","cat":"Combo Packs","cc":0.586,"sale":127000,"pc":119479,"aa":87952,"a":78740,"ma":72390,"m":66040},{"ref":"547","name":"CLEAN 9","cat":"Combo Packs","cc":0.482,"sale":104500,"pc":98285,"aa":72348,"a":64790,"ma":59565,"m":54340},{"ref":"548","name":"CLEAN 9","cat":"Combo Packs","cc":0.482,"sale":104500,"pc":98285,"aa":72348,"a":64790,"ma":59565,"m":54340},{"ref":"634","name":"START YOUR JOURNEY","cat":"Combo Packs","cc":2,"sale":325500,"pc":305664,"aa":224366,"a":201810,"ma":185535,"m":169260},{"ref":"635","name":"START YOUR JOURNEY BOOST","cat":"Combo Packs","cc":2,"sale":323000,"pc":306385,"aa":221935,"a":200260,"ma":184110,"m":167960},{"ref":"659","name":"DX4","cat":"Combo Packs","cc":0.533,"sale":115500,"pc":108678,"aa":79990,"a":71610,"ma":65835,"m":60060},{"ref":"71","name":"GARCINIA PLUS","cat":"Gestion de poids","cc":0.12,"sale":26000,"pc":24473,"aa":18013,"a":16120,"ma":14820,"m":13520},{"ref":"289","name":"FOREVER LEAN","cat":"Gestion de poids","cc":0.167,"sale":36500,"pc":34048,"aa":25060,"a":22630,"ma":20805,"m":18980},{"ref":"463","name":"FOREVER THERM","cat":"Gestion de poids","cc":0.114,"sale":25000,"pc":23246,"aa":17113,"a":15500,"ma":14250,"m":13000},{"ref":"470","name":"LITE ULTRA 15 SERVING VANILLE","cat":"Gestion de poids","cc":0.122,"sale":26500,"pc":24867,"aa":18317,"a":16430,"ma":15105,"m":13780},{"ref":"471","name":"LITE ULTRA 15 SERVING CHOCOLAT","cat":"Gestion de poids","cc":0.122,"sale":26500,"pc":24867,"aa":18317,"a":16430,"ma":15105,"m":13780},{"ref":"520","name":"FAST BREAK BAR","cat":"Gestion de poids","cc":0.021,"sale":5000,"pc":4267,"aa":3152,"a":3100,"ma":2850,"m":2600},{"ref":"37","name":"NATURE-MIN","cat":"Nutrition","cc":0.072,"sale":16000,"pc":14682,"aa":10816,"a":9920,"ma":9120,"m":8320},{"ref":"48","name":"ABSORBENT C","cat":"Nutrition","cc":0.069,"sale":15000,"pc":14073,"aa":10356,"a":9300,"ma":8550,"m":7800},{"ref":"65","name":"AIL ET THYM","cat":"Nutrition","cc":0.072,"sale":16000,"pc":14675,"aa":10816,"a":9920,"ma":9120,"m":8320},{"ref":"68","name":"FIELDS OF GREEN","cat":"Nutrition","cc":0.051,"sale":11500,"pc":10393,"aa":7657,"a":7130,"ma":6555,"m":5980},{"ref":"72","name":"LYCIUM PLUS","cat":"Nutrition","cc":0.12,"sale":26000,"pc":24473,"aa":18013,"a":16120,"ma":14820,"m":13520},{"ref":"188","name":"B12 PLUS","cat":"Nutrition","cc":0.062,"sale":13500,"pc":12638,"aa":9307,"a":8370,"ma":7695,"m":7020},{"ref":"206","name":"FOREVER CALCIUM","cat":"Nutrition","cc":0.098,"sale":21500,"pc":19975,"aa":14697,"a":13330,"ma":12255,"m":11180},{"ref":"215","name":"FOERVER MUTLI-MACA","cat":"Nutrition","cc":0.107,"sale":23500,"pc":21811,"aa":16057,"a":14570,"ma":13395,"m":12220},{"ref":"264","name":"FOREVER ACTIVE HA","cat":"Nutrition","cc":0.136,"sale":29500,"pc":27729,"aa":20414,"a":18290,"ma":16815,"m":15340},{"ref":"312","name":"FOREVER CARDIOHEALTH","cat":"Nutrition","cc":0.133,"sale":29000,"pc":27112,"aa":19960,"a":17980,"ma":16530,"m":15080},{"ref":"354","name":"FOREVER KIDS","cat":"Nutrition","cc":0.06,"sale":13500,"pc":12229,"aa":9003,"a":8370,"ma":7695,"m":7020},{"ref":"355","name":"FOREVER IMMUBLEND","cat":"Nutrition","cc":0.093,"sale":20500,"pc":18957,"aa":13954,"a":12710,"ma":11685,"m":10660},{"ref":"374","name":"VITOLIZE MEN","cat":"Nutrition","cc":0.12,"sale":26000,"pc":24473,"aa":18013,"a":16120,"ma":14820,"m":13520},{"ref":"375","name":"VITOLIZE WOMEN","cat":"Nutrition","cc":0.127,"sale":27500,"pc":25893,"aa":19068,"a":17050,"ma":15675,"m":14300},{"ref":"376","name":"FOREVER ARTIC SEA","cat":"Nutrition","cc":0.12,"sale":28000,"pc":24473,"aa":18013,"a":17360,"ma":15960,"m":14560},{"ref":"439","name":"FOREVER DAILY","cat":"Nutrition","cc":0.08,"sale":17500,"pc":16310,"aa":12006,"a":10850,"ma":9975,"m":9100},{"ref":"464","name":"FOREVER FIBER","cat":"Nutrition","cc":0.115,"sale":25000,"pc":23447,"aa":17262,"a":15500,"ma":14250,"m":13000},{"ref":"504","name":"FOREVER ARGI+STICK PACKS","cat":"Nutrition","cc":0.303,"sale":65500,"pc":61695,"aa":45474,"a":40610,"ma":37335,"m":34060},{"ref":"551","name":"FOREVER MOVE","cat":"Nutrition","cc":0.25,"sale":55000,"pc":50878,"aa":37490,"a":34100,"ma":31350,"m":28600},{"ref":"566","name":"FOREVER IMMUNE GUMMY","cat":"Nutrition","cc":0.148,"sale":32000,"pc":30145,"aa":22213,"a":19840,"ma":18240,"m":16640},{"ref":"610","name":"FOREVER ACTIVE PRO B","cat":"Nutrition","cc":0.147,"sale":32000,"pc":29974,"aa":22072,"a":19840,"ma":18240,"m":16640},{"ref":"621","name":"FOREVER SUPERGREENS","cat":"Nutrition","cc":0.154,"sale":34000,"pc":31409,"aa":23112,"a":21080,"ma":19380,"m":17680},{"ref":"622","name":"FOREVER FOCUS","cat":"Nutrition","cc":0.334,"sale":72500,"pc":68095,"aa":50135,"a":44950,"ma":41325,"m":37700},{"ref":"624","name":"FOREVER IVISION","cat":"Nutrition","cc":0.14,"sale":30500,"pc":28547,"aa":21016,"a":18910,"ma":17385,"m":15860},{"ref":"654","name":"DX4 INNERPACK","cat":"Nutrition","cc":0.14,"sale":30500,"pc":28547,"aa":21038,"a":18910,"ma":17385,"m":15860},{"ref":"656","name":"FOREVER PLANT PROTEIN POUCH","cat":"Nutrition","cc":0.223,"sale":48500,"pc":45429,"aa":33475,"a":30070,"ma":27645,"m":25220},{"ref":"26","name":"POLLEN FOREVER","cat":"Produit de la ruche","cc":0.06,"sale":13000,"pc":12229,"aa":9003,"a":8060,"ma":7410,"m":6760},{"ref":"27","name":"PROPOLIS FOREVER","cat":"Produit de la ruche","cc":0.13,"sale":28500,"pc":26502,"aa":19514,"a":17670,"ma":16245,"m":14820},{"ref":"36","name":"GELEE ROYALE FOREVER","cat":"Produit de la ruche","cc":0.13,"sale":28500,"pc":26502,"aa":19514,"a":17670,"ma":16245,"m":14820},{"ref":"207","name":"FOREVER BEE HONEY NEW BOTTLE","cat":"Produit de la ruche","cc":0.07,"sale":15500,"pc":14281,"aa":10512,"a":9610,"ma":8835,"m":8060},{"ref":"51","name":"ALOE PROPOLIS CREME (TUBES)","cat":"Soins de la peau","cc":0.077,"sale":16000,"pc":15701,"aa":11560,"a":9920,"ma":9120,"m":8320},{"ref":"61","name":"GELEE ALOES","cat":"Soins de la peau","cc":0.059,"sale":13000,"pc":12028,"aa":8854,"a":8060,"ma":7410,"m":6760},{"ref":"63","name":"EMULSION VISAGE ALOES","cat":"Soins de la peau","cc":0.059,"sale":13000,"pc":12028,"aa":8854,"a":8060,"ma":7410,"m":6760},{"ref":"64","name":"EMULSION THERMOGENE ALOES","cat":"Soins de la peau","cc":0.059,"sale":13000,"pc":12028,"aa":8854,"a":8060,"ma":7410,"m":6760},{"ref":"69","name":"R3 FACTEUR ALOES","cat":"Soins de la peau","cc":0.13,"sale":28500,"pc":26502,"aa":19514,"a":17670,"ma":16245,"m":14820},{"ref":"187","name":"ALPHA E FACTOR","cat":"Soins de la peau","cc":0.134,"sale":30000,"pc":27320,"aa":20109,"a":18600,"ma":17100,"m":15600},{"ref":"205","name":"ALOE MSM GEL","cat":"Soins de la peau","cc":0.093,"sale":20500,"pc":18957,"aa":13954,"a":12710,"ma":11685,"m":10660},{"ref":"238","name":"ALOE SCRUB","cat":"Soins de la peau","cc":0.062,"sale":13500,"pc":12638,"aa":9307,"a":8370,"ma":7695,"m":7020},{"ref":"554","name":"INFINITE HYDRATING CLEANSER","cat":"Soins de la peau","cc":0.112,"sale":24500,"pc":22867,"aa":16853,"a":15190,"ma":13965,"m":12740},{"ref":"555","name":"INFINITE FIRMING SRUM","cat":"Soins de la peau","cc":0.179,"sale":38500,"pc":36449,"aa":26859,"a":23870,"ma":21945,"m":20020},{"ref":"556","name":"INFINITE FIRMING COMPLEX","cat":"Soins de la peau","cc":0.179,"sale":38500,"pc":36375,"aa":26807,"a":23870,"ma":21945,"m":20020},{"ref":"558","name":"INFINITE RESTORING CREAM","cat":"Soins de la peau","cc":0.2,"sale":43000,"pc":40694,"aa":29989,"a":26660,"ma":24510,"m":22360},{"ref":"559","name":"SMOOTHING EXFOLIATOR","cat":"Soins de la peau","cc":0.073,"sale":16000,"pc":14868,"aa":10950,"a":9920,"ma":9120,"m":8320},{"ref":"560","name":"BALANCING TONER","cat":"Soins de la peau","cc":0.087,"sale":19000,"pc":17730,"aa":13062,"a":11780,"ma":10830,"m":9880},{"ref":"561","name":"EYE CREME","cat":"Soins de la peau","cc":0.073,"sale":16000,"pc":14868,"aa":10950,"a":9920,"ma":9120,"m":8320},{"ref":"612","name":"ALOE ACTIVATOR","cat":"Soins de la peau","cc":0.064,"sale":14000,"pc":13054,"aa":9605,"a":8680,"ma":7980,"m":7280},{"ref":"618","name":"HYDRATING SERUM US","cat":"Soins de la peau","cc":0.14,"sale":30500,"pc":28547,"aa":21016,"a":18910,"ma":17385,"m":15860},{"ref":"645","name":"PROTECT DAY LOTION","cat":"Soins de la peau","cc":0.146,"sale":32000,"pc":29736,"aa":21908,"a":19840,"ma":18240,"m":16640},{"ref":"647","name":"ALOE BODY LOTION","cat":"Soins de la peau","cc":0.091,"sale":20000,"pc":18548,"aa":13664,"a":12400,"ma":11400,"m":10400},{"ref":"651","name":"DEEP MOISTURIZING CREAM","cat":"Soins de la peau","cc":0.148,"sale":32000,"pc":30145,"aa":22213,"a":19840,"ma":18240,"m":16640},{"ref":"653","name":"REPLENISHING SKIN OIL","cat":"Soins de la peau","cc":0.121,"sale":26500,"pc":24644,"aa":18161,"a":16430,"ma":15105,"m":13780},{"ref":"14","name":"GELEE BAIN ALOES","cat":"Soins personnels","cc":0.072,"sale":16000,"pc":14682,"aa":10816,"a":9920,"ma":9120,"m":8320},{"ref":"22","name":"ALOE LEVRES","cat":"Soins personnels","cc":0.014,"sale":3500,"pc":2855,"aa":2096,"a":2170,"ma":1995,"m":1820},{"ref":"28","name":"FOREVER BRIGHT ALOES","cat":"Soins personnels","cc":0.031,"sale":7000,"pc":6319,"aa":4654,"a":4340,"ma":3990,"m":3640},{"ref":"40","name":"ALOE FIRST","cat":"Soins personnels","cc":0.079,"sale":17500,"pc":16109,"aa":11857,"a":10850,"ma":9975,"m":9100},{"ref":"67","name":"STICK DEODORANT ALOES","cat":"Soins personnels","cc":0.029,"sale":7000,"pc":6245,"aa":4594,"a":4340,"ma":3990,"m":3640},{"ref":"284","name":"AVOCADO SOAP","cat":"Soins personnels","cc":0.027,"sale":6500,"pc":6066,"aa":4468,"a":4030,"ma":3705,"m":3380},{"ref":"564","name":"ALOE COOLING LOTION","cat":"Soins personnels","cc":0.06,"sale":13000,"pc":12229,"aa":9003,"a":8060,"ma":7410,"m":6760},{"ref":"613","name":"FOREVER MARINE COLLAGEN","cat":"Soins personnels","cc":0.327,"sale":69000,"pc":65550,"aa":48300,"a":42780,"ma":39330,"m":35880},{"ref":"633","name":"ALOE LIQUID SOAP","cat":"Soins personnels","cc":0.075,"sale":16500,"pc":15284,"aa":11255,"a":10230,"ma":9405,"m":8580},{"ref":"640","name":"ALOE JOJOBA  SHAMPOO","cat":"Soins personnels","cc":0.087,"sale":19000,"pc":17730,"aa":13062,"a":11780,"ma":10830,"m":9880},{"ref":"641","name":"ALOE JOJOBA  CONDTIONNER","cat":"Soins personnels","cc":0.093,"sale":20500,"pc":18927,"aa":13954,"a":12710,"ma":11685,"m":10660},{"ref":"642","name":"NOURISHING HAIR OIL","cat":"Soins personnels","cc":0.111,"sale":24000,"pc":22607,"aa":16660,"a":14880,"ma":13680,"m":12480},{"ref":"643","name":"ALOFA WOMEN'S PERFUME","cat":"Soins personnels","cc":0.134,"sale":29000,"pc":27298,"aa":20109,"a":17980,"ma":16530,"m":15080},{"ref":"644","name":"MALOSI MEN'S COLOGNEE","cat":"Soins personnels","cc":0.134,"sale":29000,"pc":27298,"aa":20109,"a":17980,"ma":16530,"m":15080},{"ref":"646","name":"ALOE BODY WASH","cat":"Soins personnels","cc":0.09,"sale":19500,"pc":18332,"aa":13508,"a":12090,"ma":11115,"m":10140},{"ref":"664","name":"FOREVER BIO CELLULOSE MASK X3","cat":"Soins personnels","cc":0.127,"sale":27500,"pc":25863,"aa":19061,"a":17050,"ma":15675,"m":14300},{"ref":"686","name":"Forever Vitamin C","cat":"Autres","cc":0.198,"sale":42500,"pc":40329,"aa":29714,"a":26350,"ma":24225,"m":22100},{"ref":"687","name":"Forever Bakuchiol","cat":"Autres","cc":0.198,"sale":null,"pc":null,"aa":null,"a":null,"ma":null,"m":null}];
+var LEVELS=[['sale','Vente'],['pc','PC'],['aa','AA'],['a','A'],['ma','MA'],['m','M']];
+var state={tier:'aa',cart:{}};
+var deferredInstallPrompt=null;
+function el(id){return document.getElementById(id);}
+function product(ref){for(var i=0;i<PRODUCTS.length;i++){if(PRODUCTS[i].ref===ref)return PRODUCTS[i];}return null;}
+function levelLabel(key){for(var i=0;i<LEVELS.length;i++){if(LEVELS[i][0]===key)return LEVELS[i][1];}return key;}
+function fmt(n){var v=Math.round(Number(n)||0);try{return v.toLocaleString('fr-FR')+' FCFA';}catch(e){return String(v).replace(/\B(?=(\d{3})+(?!\d))/g,' ')+' FCFA';}}
+function fmtcc(n){var v=Number(n)||0;try{return v.toLocaleString('fr-FR',{minimumFractionDigits:3,maximumFractionDigits:3});}catch(e){return v.toFixed(3).replace('.',',');}}
+function unit(p,t){var tier=t||state.tier;return p?p[tier]:null;}
+function save(){try{localStorage.setItem('foreverCivSim',JSON.stringify(state));}catch(e){}}
+function load(){try{var s=JSON.parse(localStorage.getItem('foreverCivSim')||'null');if(s&&s.cart&&s.tier){state=s;}}catch(e){}if(!levelLabel(state.tier))state.tier='aa';}
+function setTier(tier){state.tier=tier;save();renderAll();}
+function bindTierButtons(){var bs=document.querySelectorAll('.tier[data-tier]');for(var i=0;i<bs.length;i++){(function(b){b.addEventListener('click',function(){setTier(b.getAttribute('data-tier'));});})(bs[i]);}}
+function renderTiers(){var bs=document.querySelectorAll('.tier[data-tier]');for(var i=0;i<bs.length;i++){var active=bs[i].getAttribute('data-tier')===state.tier;bs[i].className='tier'+(active?' active':'');bs[i].setAttribute('aria-pressed',active?'true':'false');}}
+function normalize(s){return String(s||'').toLocaleLowerCase('fr');}
+function renderResults(){var search=el('search');var results=el('results');var q=normalize(search.value).trim();var list=[];for(var i=0;i<PRODUCTS.length;i++){var p=PRODUCTS[i];if(!q||normalize(p.name).indexOf(q)!==-1||p.ref.indexOf(q)!==-1||normalize(p.cat).indexOf(q)!==-1)list.push(p);if(list.length>=(q?30:12))break;}
+results.innerHTML='';if(!list.length){results.innerHTML='<div class="empty">Aucun produit trouvé.</div>';return;}
+for(var j=0;j<list.length;j++){(function(p){var row=document.createElement('div');row.className='result';var left=document.createElement('div');var pr=unit(p);left.innerHTML='<div class="pname"></div><div class="meta"></div><div class="price"></div>';left.children[0].textContent=p.name;left.children[1].textContent='Réf. '+p.ref+' • '+p.cat+' • '+fmtcc(p.cc)+' CC';left.children[2].textContent=pr==null?'Prix non renseigné':fmt(pr);if(pr==null)left.children[2].className+=' missing';var b=document.createElement('button');b.type='button';b.className='add';b.textContent='Ajouter';b.disabled=pr==null;b.addEventListener('click',function(){state.cart[p.ref]=(state.cart[p.ref]||0)+1;save();renderCart();renderSummary();toast(p.name+' ajouté');});row.appendChild(left);row.appendChild(b);results.appendChild(row);})(list[j]);}}
+function change(ref,d){state.cart[ref]=(state.cart[ref]||0)+d;if(state.cart[ref]<=0)delete state.cart[ref];save();renderCart();renderSummary();}
+function renderCart(){var cart=el('cart');cart.innerHTML='';var refs=[];for(var ref in state.cart){if(Object.prototype.hasOwnProperty.call(state.cart,ref)&&state.cart[ref]>0)refs.push(ref);}if(!refs.length){cart.innerHTML='<div class="empty">Ajoute des produits pour commencer la simulation.</div>';return;}
+for(var i=0;i<refs.length;i++){(function(ref){var q=state.cart[ref],p=product(ref);if(!p)return;var pr=unit(p);var row=document.createElement('div');row.className='lineitem';var left=document.createElement('div');left.innerHTML='<div class="pname"></div><div class="meta"></div><div class="qtyrow"></div>';left.children[0].textContent=p.name;left.children[1].textContent='Réf. '+p.ref+' • '+(pr==null?'prix manquant':fmt(pr)+' / unité');var qr=left.children[2];var minus=document.createElement('button');minus.type='button';minus.className='qtybtn';minus.textContent='−';minus.setAttribute('aria-label','Diminuer '+p.name);minus.addEventListener('click',function(){change(ref,-1);});var qs=document.createElement('span');qs.className='qty';qs.textContent=q;var plus=document.createElement('button');plus.type='button';plus.className='qtybtn';plus.textContent='+';plus.setAttribute('aria-label','Augmenter '+p.name);plus.addEventListener('click',function(){change(ref,1);});var del=document.createElement('button');del.type='button';del.className='del';del.textContent='Supprimer';del.addEventListener('click',function(){delete state.cart[ref];save();renderCart();renderSummary();});qr.appendChild(minus);qr.appendChild(qs);qr.appendChild(plus);qr.appendChild(del);var right=document.createElement('div');right.innerHTML='<div class="lineamount"></div><div class="linecc"></div>';right.children[0].textContent=pr==null?'—':fmt(pr*q);right.children[1].textContent=fmtcc(p.cc*q)+' CC';row.appendChild(left);row.appendChild(right);cart.appendChild(row);})(refs[i]);}}
+function totals(tier){var amount=0,cc=0,count=0;for(var ref in state.cart){if(!Object.prototype.hasOwnProperty.call(state.cart,ref))continue;var q=state.cart[ref],p=product(ref);if(!p||q<=0)continue;count+=q;cc+=(p.cc||0)*q;var u=unit(p,tier||state.tier);if(u!=null)amount+=u*q;}return{amount:amount,cc:cc,count:count};}
+function renderSummary(){var t=totals();el('total').textContent=fmt(t.amount);el('cc').textContent=fmtcc(t.cc);el('count').textContent=t.count;el('fixedTotal').textContent=fmt(t.amount);el('fixedCc').textContent=fmtcc(t.cc);el('fixedTier').textContent='Tarif '+levelLabel(state.tier);var c=el('compare');c.innerHTML='';for(var i=0;i<LEVELS.length;i++){var tt=totals(LEVELS[i][0]);var a=document.createElement('div');a.textContent=LEVELS[i][1];var v=document.createElement('div');v.className='val';v.textContent=fmt(tt.amount);c.appendChild(a);c.appendChild(v);}}
+function recapText(){var lines=['SIMULATION FOREVER CIV — Tarif '+levelLabel(state.tier),''];for(var ref in state.cart){if(!Object.prototype.hasOwnProperty.call(state.cart,ref))continue;var q=state.cart[ref],p=product(ref);if(!p||q<=0)continue;var u=unit(p);lines.push(q+' × '+p.name+' = '+(u==null?'—':fmt(u*q))+' ('+fmtcc(p.cc*q)+' CC)');}var t=totals();lines.push('','TOTAL : '+fmt(t.amount),'TOTAL CC : '+fmtcc(t.cc));return lines.join('\n');}
+function showRecap(){var ta=el('shareText');ta.value=recapText();ta.style.display='block';ta.focus();}
+function fallbackCopy(text){var ta=el('shareText');ta.value=text;ta.style.display='block';ta.focus();ta.select();try{var ok=document.execCommand('copy');toast(ok?'Récapitulatif copié':'Sélectionne le texte puis copie-le');}catch(e){toast('Sélectionne le texte puis copie-le');}}
+function copyRecap(){var text=recapText();if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(text).then(function(){toast('Récapitulatif copié');},function(){fallbackCopy(text);});}else{fallbackCopy(text);}}
+function shareRecap(){var text=recapText();if(navigator.share){navigator.share({title:'Simulation Forever CIV',text:text}).catch(function(){});}else{copyRecap();}}
+function toast(msg){var t=el('toast');t.textContent=msg;t.style.display='block';clearTimeout(toast.timer);toast.timer=setTimeout(function(){t.style.display='none';},1800);}
+function updateNetwork(){var s=el('netStatus');if(navigator.onLine){s.textContent='En ligne';s.className='status online';}else{s.textContent='Hors connexion';s.className='status';}}
+function isIOS(){return /iphone|ipad|ipod/i.test(navigator.userAgent)||((navigator.platform==='MacIntel')&&navigator.maxTouchPoints>1);}
+function isStandalone(){return window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true;}
+function openInstallHelp(){var help=el('installHelp');if(isStandalone()){help.innerHTML='<p>L’application est déjà ouverte en mode installé.</p>';}else if(isIOS()){help.innerHTML='<p><strong>iPhone / iPad :</strong> ouvre cette page dans Safari, touche <strong>Partager</strong>, puis <strong>Sur l’écran d’accueil</strong>. Active <strong>Ouvrir comme app web</strong>, puis touche <strong>Ajouter</strong>.</p>';}else{help.innerHTML='<p><strong>Android :</strong> dans Chrome, ouvre le menu ⋮ puis choisis <strong>Installer l’application</strong> ou <strong>Installer et créer un raccourci</strong>.</p>';}el('installModal').style.display='flex';}
+function setupInstall(){window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();deferredInstallPrompt=e;});el('installBtn').addEventListener('click',function(){if(deferredInstallPrompt){deferredInstallPrompt.prompt();deferredInstallPrompt.userChoice.then(function(){deferredInstallPrompt=null;});}else{openInstallHelp();}});el('closeModal').addEventListener('click',function(){el('installModal').style.display='none';});el('installModal').addEventListener('click',function(e){if(e.target===el('installModal'))el('installModal').style.display='none';});}
+function registerSW(){if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('./sw.js').catch(function(){});});}}
+function renderAll(){renderTiers();renderResults();renderCart();renderSummary();}
+function init(){load();bindTierButtons();el('search').addEventListener('input',renderResults);el('clear').addEventListener('click',function(){if(totals().count>0&&!window.confirm('Vider entièrement le panier ?'))return;state.cart={};save();renderCart();renderSummary();});el('print').addEventListener('click',function(){window.print();});el('recap').addEventListener('click',showRecap);el('copy').addEventListener('click',copyRecap);el('share').addEventListener('click',shareRecap);window.addEventListener('online',updateNetwork);window.addEventListener('offline',updateNetwork);updateNetwork();setupInstall();renderAll();registerSW();}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+</script>
+</body>
+</html>
