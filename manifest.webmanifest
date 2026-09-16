@@ -1,7 +1,7 @@
 {
   "name": "Simulateur Forever CIV",
   "short_name": "Forever CIV",
-  "description": "Simulation mobile des prix Forever CIV avec simulations sauvegardées, devis PDF, partage WhatsApp et total CC.",
+  "description": "Simulation mobile des prix Forever CIV avec simulations sauvegardées, partage de vrais fichiers PNG, devis PDF et total CC.",
   "lang": "fr",
   "dir": "ltr",
   "start_url": "./",
