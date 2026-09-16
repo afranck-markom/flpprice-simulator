@@ -1,22 +1,21 @@
-# Simulateur Forever CIV — GitHub Pages / PWA
+# Simulateur Forever CIV — PWA GitHub Pages — Version 2
 
-Cette version est prête à être publiée sur **GitHub Pages** et installée comme application web sur **Android** et **iPhone**.
+Application web installable sur **Android** et **iPhone**.
 
-## Fichiers à conserver à la racine du dépôt
+## Fonctions
 
-- `index.html` — simulateur complet (92 produits, Vente / PC / AA / A / MA / M)
-- `manifest.webmanifest` — configuration d'installation de l'application
-- `sw.js` — fonctionnement hors connexion après la première ouverture
-- `.nojekyll` — publication statique directe sur GitHub Pages
-- `icons/` — icônes Android/iPhone
+- 92 produits Forever CIV
+- Tarifs Vente, PC, AA, A, MA et M
+- Total FCFA et Total CC
+- Sauvegarde de plusieurs simulations sur le téléphone
+- Rechargement et suppression des simulations enregistrées
+- Création d’un devis client imprimable / enregistrable en PDF
+- Partage direct du panier sur WhatsApp
+- Partage natif, copie du récapitulatif et impression
+- Fonctionnement hors connexion après la première ouverture
 
-## Publication rapide
+## Mise à jour d’un dépôt GitHub existant
 
-1. Créer un compte GitHub et vérifier l'adresse e-mail.
-2. Créer un dépôt public, par exemple `forever-civ`.
-3. Charger **le contenu de ce dossier** à la racine du dépôt.
-4. Dans `Settings > Pages`, choisir `Deploy from a branch`, branche `main`, dossier `/(root)`.
-5. Ouvrir l'adresse fournie par GitHub Pages.
-6. Installer la web-app depuis Safari sur iPhone ou Chrome sur Android.
+Remplacer les fichiers `index.html`, `manifest.webmanifest` et `sw.js` du dépôt par ceux de cette version, puis valider avec **Commit changes**. Les icônes peuvent rester identiques.
 
-Voir `GUIDE_GITHUB_PAS_A_PAS.md` pour les instructions détaillées.
+Voir `MISE_A_JOUR_GITHUB_V2.md` pour la procédure détaillée.

@@ -83,6 +83,29 @@ details summary{cursor:pointer;font-weight:800;color:var(--accent);padding:8px 0
 .modal h3{margin:0 0 8px;font-size:1.05rem}
 .modal p{margin:7px 0;color:var(--muted);line-height:1.5;font-size:.9rem}
 .modal .close{width:100%;min-height:46px;margin-top:12px;border:0;border-radius:12px;background:var(--accent);color:#fff;font-weight:800}
+.savedhead{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.savedactions{display:flex;gap:7px;flex-wrap:wrap}
+.smallaction{min-height:42px;border:1px solid var(--line);border-radius:11px;background:#fff;color:var(--text);font-weight:800;padding:0 12px}
+.smallaction.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.savedlist{margin-top:8px}
+.saveditem{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:11px 0;border-top:1px solid var(--line)}
+.saveditem:first-child{border-top:0}
+.savedname{font-weight:850;font-size:.92rem;overflow-wrap:anywhere}
+.savedmeta{font-size:.76rem;color:var(--muted);margin-top:3px;line-height:1.4}
+.savedbuttons{display:flex;gap:6px;align-items:center}
+.iconbtn{min-height:40px;border:1px solid var(--line);border-radius:10px;background:#fff;font-weight:800;padding:0 10px;color:var(--accent)}
+.iconbtn.danger{color:var(--danger)}
+.formgrid{display:grid;grid-template-columns:1fr;gap:10px;margin-top:10px}
+.field label{display:block;font-size:.77rem;color:var(--muted);font-weight:800;margin:0 0 5px}
+.field input,.field textarea{width:100%;border:1px solid var(--line);border-radius:11px;background:#fff;color:var(--text);font-size:16px;padding:10px 12px;outline:none}
+.field input{min-height:46px}.field textarea{min-height:82px;resize:vertical}
+.field input:focus,.field textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent2)}
+.modalactions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.modalaction{min-height:46px;border:1px solid var(--line);border-radius:12px;background:#fff;color:var(--text);font-weight:800}
+.modalaction.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.whatsapp{background:#1f9d55!important;border-color:#1f9d55!important;color:#fff!important}
+.featurehint{font-size:.78rem;color:var(--muted);line-height:1.45;margin-top:8px}
+@media(max-width:420px){.saveditem{grid-template-columns:1fr}.savedbuttons{justify-content:flex-start}.modalactions{grid-template-columns:1fr}}
 @media(min-width:640px){.app{padding:20px 18px 105px}.tiers{grid-template-columns:repeat(6,1fr)}}
 @media(max-width:420px){.headrow{align-items:center}h1{font-size:1.25rem}.lineitem{grid-template-columns:1fr}.lineamount,.linecc{text-align:left}}
 @media print{body{background:#fff}.fixedtotal,.searchcard,.actions,.linkbtn,.tiers,.install,.statusrow{display:none!important}.card{box-shadow:none}.app{padding-bottom:0}}
@@ -120,6 +143,17 @@ details summary{cursor:pointer;font-weight:800;color:var(--accent);padding:8px 0
   </section>
 
   <section class="card">
+    <div class="savedhead">
+      <div><h2 style="font-size:1rem;margin:0">Mes simulations</h2><div class="featurehint">Enregistre plusieurs paniers sur ce téléphone et recharge-les quand tu veux.</div></div>
+      <div class="savedactions">
+        <button id="saveSimulation" class="smallaction primary" type="button">Enregistrer</button>
+        <button id="newSimulation" class="smallaction" type="button">Nouvelle</button>
+      </div>
+    </div>
+    <div id="savedList" class="savedlist"></div>
+  </section>
+
+  <section class="card">
     <div class="summary">
       <div class="metric primary"><span>Total à payer</span><strong id="total">0 FCFA</strong></div>
       <div class="metric"><span>Total CC</span><strong id="cc">0,000</strong></div>
@@ -128,9 +162,11 @@ details summary{cursor:pointer;font-weight:800;color:var(--accent);padding:8px 0
     <details style="margin-top:10px"><summary>Comparer le même panier aux 6 tarifs</summary><div class="compare" id="compare"></div></details>
     <div class="actions">
       <button id="recap" class="action" type="button">Récapitulatif</button>
-      <button id="share" class="action primary" type="button">Partager</button>
-      <button id="print" class="action" type="button">Imprimer / PDF</button>
+      <button id="whatsapp" class="action whatsapp" type="button">WhatsApp</button>
+      <button id="quote" class="action primary" type="button">Devis / PDF</button>
+      <button id="share" class="action" type="button">Partager</button>
       <button id="copy" class="action" type="button">Copier</button>
+      <button id="print" class="action" type="button">Imprimer panier</button>
     </div>
     <textarea id="shareText" readonly aria-label="Récapitulatif de la simulation"></textarea>
     <p class="note">Les montants proviennent de la liste CIV fournie. « PC » reprend « Tarif PC TTC » et « AA » reprend « Tarif FBO TTC ». Forever Bakuchiol (réf. 687) est conservé sans prix renseigné.</p>
@@ -139,6 +175,21 @@ details summary{cursor:pointer;font-weight:800;color:var(--accent);padding:8px 0
 <div class="fixedtotal"><div class="fixedinner"><div><small id="fixedTier">Tarif AA</small><strong id="fixedTotal">0 FCFA</strong></div><div style="text-align:right"><small>Total CC</small><strong id="fixedCc">0,000</strong></div></div></div>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
 <div id="installModal" class="modalback" role="dialog" aria-modal="true" aria-labelledby="installTitle"><div class="modal"><h3 id="installTitle">Installer Forever CIV</h3><div id="installHelp"></div><button id="closeModal" type="button" class="close">Fermer</button></div></div>
+<div id="quoteModal" class="modalback" role="dialog" aria-modal="true" aria-labelledby="quoteTitle">
+  <div class="modal">
+    <h3 id="quoteTitle">Créer un devis</h3>
+    <p>Les informations client sont facultatives. Le devis reprend le tarif actuellement sélectionné et le contenu du panier.</p>
+    <div class="formgrid">
+      <div class="field"><label for="quoteClient">Nom du client</label><input id="quoteClient" type="text" placeholder="Ex. Mme Kouassi" autocomplete="name"></div>
+      <div class="field"><label for="quotePhone">Téléphone</label><input id="quotePhone" type="tel" placeholder="Ex. +225 07 00 00 00 00" autocomplete="tel"></div>
+      <div class="field"><label for="quoteNote">Note / observation</label><textarea id="quoteNote" placeholder="Ex. Offre valable sous réserve de disponibilité."></textarea></div>
+    </div>
+    <div class="modalactions">
+      <button id="generateQuote" class="modalaction primary" type="button">Ouvrir le devis</button>
+      <button id="closeQuote" class="modalaction" type="button">Annuler</button>
+    </div>
+  </div>
+</div>
 
 <script>
 (function(){
@@ -147,6 +198,8 @@ var PRODUCTS=[{"ref":"815","name":"PULPE D'ALOES","cat":"Buvable","cc":0.1,"sale
 var LEVELS=[['sale','Vente'],['pc','PC'],['aa','AA'],['a','A'],['ma','MA'],['m','M']];
 var state={tier:'aa',cart:{}};
 var deferredInstallPrompt=null;
+var SAVED_KEY='foreverCivSavedSimsV1';
+var savedSimulations=[];
 function el(id){return document.getElementById(id);}
 function product(ref){for(var i=0;i<PRODUCTS.length;i++){if(PRODUCTS[i].ref===ref)return PRODUCTS[i];}return null;}
 function levelLabel(key){for(var i=0;i<LEVELS.length;i++){if(LEVELS[i][0]===key)return LEVELS[i][1];}return key;}
@@ -167,6 +220,27 @@ function renderCart(){var cart=el('cart');cart.innerHTML='';var refs=[];for(var 
 for(var i=0;i<refs.length;i++){(function(ref){var q=state.cart[ref],p=product(ref);if(!p)return;var pr=unit(p);var row=document.createElement('div');row.className='lineitem';var left=document.createElement('div');left.innerHTML='<div class="pname"></div><div class="meta"></div><div class="qtyrow"></div>';left.children[0].textContent=p.name;left.children[1].textContent='Réf. '+p.ref+' • '+(pr==null?'prix manquant':fmt(pr)+' / unité');var qr=left.children[2];var minus=document.createElement('button');minus.type='button';minus.className='qtybtn';minus.textContent='−';minus.setAttribute('aria-label','Diminuer '+p.name);minus.addEventListener('click',function(){change(ref,-1);});var qs=document.createElement('span');qs.className='qty';qs.textContent=q;var plus=document.createElement('button');plus.type='button';plus.className='qtybtn';plus.textContent='+';plus.setAttribute('aria-label','Augmenter '+p.name);plus.addEventListener('click',function(){change(ref,1);});var del=document.createElement('button');del.type='button';del.className='del';del.textContent='Supprimer';del.addEventListener('click',function(){delete state.cart[ref];save();renderCart();renderSummary();});qr.appendChild(minus);qr.appendChild(qs);qr.appendChild(plus);qr.appendChild(del);var right=document.createElement('div');right.innerHTML='<div class="lineamount"></div><div class="linecc"></div>';right.children[0].textContent=pr==null?'—':fmt(pr*q);right.children[1].textContent=fmtcc(p.cc*q)+' CC';row.appendChild(left);row.appendChild(right);cart.appendChild(row);})(refs[i]);}}
 function totals(tier){var amount=0,cc=0,count=0;for(var ref in state.cart){if(!Object.prototype.hasOwnProperty.call(state.cart,ref))continue;var q=state.cart[ref],p=product(ref);if(!p||q<=0)continue;count+=q;cc+=(p.cc||0)*q;var u=unit(p,tier||state.tier);if(u!=null)amount+=u*q;}return{amount:amount,cc:cc,count:count};}
 function renderSummary(){var t=totals();el('total').textContent=fmt(t.amount);el('cc').textContent=fmtcc(t.cc);el('count').textContent=t.count;el('fixedTotal').textContent=fmt(t.amount);el('fixedCc').textContent=fmtcc(t.cc);el('fixedTier').textContent='Tarif '+levelLabel(state.tier);var c=el('compare');c.innerHTML='';for(var i=0;i<LEVELS.length;i++){var tt=totals(LEVELS[i][0]);var a=document.createElement('div');a.textContent=LEVELS[i][1];var v=document.createElement('div');v.className='val';v.textContent=fmt(tt.amount);c.appendChild(a);c.appendChild(v);}}
+function cloneCart(cart){var out={};for(var ref in cart){if(Object.prototype.hasOwnProperty.call(cart,ref)&&Number(cart[ref])>0)out[ref]=Number(cart[ref]);}return out;}
+function loadSavedSimulations(){try{var raw=JSON.parse(localStorage.getItem(SAVED_KEY)||'[]');savedSimulations=raw&&raw.length?raw:[];}catch(e){savedSimulations=[];}}
+function persistSavedSimulations(){try{localStorage.setItem(SAVED_KEY,JSON.stringify(savedSimulations));}catch(e){toast('Impossible d’enregistrer sur cet appareil');}}
+function defaultSimulationName(){var d=new Date();var dd=String(d.getDate()).padStart?String(d.getDate()).padStart(2,'0'):('0'+d.getDate()).slice(-2);var mm=String(d.getMonth()+1).padStart?String(d.getMonth()+1).padStart(2,'0'):('0'+(d.getMonth()+1)).slice(-2);var hh=String(d.getHours()).padStart?String(d.getHours()).padStart(2,'0'):('0'+d.getHours()).slice(-2);var mi=String(d.getMinutes()).padStart?String(d.getMinutes()).padStart(2,'0'):('0'+d.getMinutes()).slice(-2);return 'Simulation '+dd+'/'+mm+' '+hh+':'+mi;}
+function saveCurrentSimulation(){var t=totals();if(t.count<=0){toast('Ajoute au moins un produit avant d’enregistrer');return;}var suggested=defaultSimulationName();var name=window.prompt('Nom de la simulation :',suggested);if(name===null)return;name=String(name).trim()||suggested;var item={id:String(Date.now()),name:name,tier:state.tier,cart:cloneCart(state.cart),savedAt:new Date().toISOString()};savedSimulations.unshift(item);persistSavedSimulations();renderSavedSimulations();toast('Simulation enregistrée');}
+function newSimulation(){if(totals().count>0&&!window.confirm('Créer une nouvelle simulation et vider le panier actuel ?'))return;state={tier:state.tier||'aa',cart:{}};save();renderAll();toast('Nouvelle simulation prête');}
+function loadSimulation(id){for(var i=0;i<savedSimulations.length;i++){if(savedSimulations[i].id===id){state.tier=savedSimulations[i].tier||'aa';state.cart=cloneCart(savedSimulations[i].cart||{});save();renderAll();window.scrollTo(0,0);toast('Simulation chargée');return;}}}
+function deleteSimulation(id){for(var i=0;i<savedSimulations.length;i++){if(savedSimulations[i].id===id){if(!window.confirm('Supprimer « '+savedSimulations[i].name+' » ?'))return;savedSimulations.splice(i,1);persistSavedSimulations();renderSavedSimulations();toast('Simulation supprimée');return;}}}
+function savedDate(iso){try{return new Date(iso).toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});}catch(e){return '';}}
+function renderSavedSimulations(){var box=el('savedList');if(!box)return;box.innerHTML='';if(!savedSimulations.length){box.innerHTML='<div class="empty" style="padding:14px 8px">Aucune simulation enregistrée pour le moment.</div>';return;}for(var i=0;i<savedSimulations.length;i++){(function(item){var t=totalsForCart(item.cart,item.tier);var row=document.createElement('div');row.className='saveditem';var left=document.createElement('div');left.innerHTML='<div class="savedname"></div><div class="savedmeta"></div>';left.children[0].textContent=item.name;left.children[1].textContent='Tarif '+levelLabel(item.tier)+' • '+t.count+' article'+(t.count>1?'s':'')+' • '+fmt(t.amount)+' • '+savedDate(item.savedAt);var buttons=document.createElement('div');buttons.className='savedbuttons';var loadBtn=document.createElement('button');loadBtn.type='button';loadBtn.className='iconbtn';loadBtn.textContent='Charger';loadBtn.addEventListener('click',function(){loadSimulation(item.id);});var delBtn=document.createElement('button');delBtn.type='button';delBtn.className='iconbtn danger';delBtn.textContent='Supprimer';delBtn.addEventListener('click',function(){deleteSimulation(item.id);});buttons.appendChild(loadBtn);buttons.appendChild(delBtn);row.appendChild(left);row.appendChild(buttons);box.appendChild(row);})(savedSimulations[i]);}}
+function totalsForCart(cart,tier){var amount=0,cc=0,count=0;for(var ref in cart){if(!Object.prototype.hasOwnProperty.call(cart,ref))continue;var q=Number(cart[ref])||0,p=product(ref);if(!p||q<=0)continue;count+=q;cc+=(p.cc||0)*q;var u=unit(p,tier);if(u!=null)amount+=u*q;}return{amount:amount,cc:cc,count:count};}
+function whatsappText(){var lines=['*SIMULATION FOREVER CIV*','Tarif : '+levelLabel(state.tier),''];for(var ref in state.cart){if(!Object.prototype.hasOwnProperty.call(state.cart,ref))continue;var q=state.cart[ref],p=product(ref);if(!p||q<=0)continue;var u=unit(p);lines.push(q+' × '+p.name+' — '+(u==null?'prix non renseigné':fmt(u*q)));}var t=totals();lines.push('','*TOTAL : '+fmt(t.amount)+'*','Total CC : '+fmtcc(t.cc));return lines.join('\n');}
+function shareWhatsApp(){if(totals().count<=0){toast('Le panier est vide');return;}var url='https://wa.me/?text='+encodeURIComponent(whatsappText());window.open(url,'_blank');}
+function escHtml(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function quoteNumber(){var d=new Date(),y=d.getFullYear(),m=('0'+(d.getMonth()+1)).slice(-2),day=('0'+d.getDate()).slice(-2),h=('0'+d.getHours()).slice(-2),mi=('0'+d.getMinutes()).slice(-2);return 'CIV-'+y+m+day+'-'+h+mi;}
+function quoteHtml(client,phone,note){var t=totals();var rows='';for(var ref in state.cart){if(!Object.prototype.hasOwnProperty.call(state.cart,ref))continue;var q=state.cart[ref],p=product(ref);if(!p||q<=0)continue;var u=unit(p);rows+='<tr><td>'+escHtml(p.ref)+'</td><td>'+escHtml(p.name)+'</td><td class="num">'+q+'</td><td class="num">'+(u==null?'—':escHtml(fmt(u)))+'</td><td class="num">'+(u==null?'—':escHtml(fmt(u*q)))+'</td></tr>';}
+var now=new Date();var date='';try{date=now.toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'});}catch(e){date=now.toLocaleDateString();}
+return '<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Devis Forever CIV</title><style>body{font-family:Arial,sans-serif;color:#18211d;margin:0;padding:28px}.top{display:flex;justify-content:space-between;gap:20px;border-bottom:3px solid #0a7d4f;padding-bottom:15px}.brand{font-size:24px;font-weight:800;color:#0a7d4f}.muted{color:#68756e;font-size:13px;line-height:1.5}.box{margin:18px 0;padding:14px;border:1px solid #dce5e0;border-radius:10px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}table{width:100%;border-collapse:collapse;margin-top:18px;font-size:13px}th{background:#e8f5ee;text-align:left;padding:9px;border-bottom:1px solid #bcdcca}td{padding:9px;border-bottom:1px solid #e2e8e4}.num{text-align:right;white-space:nowrap}.total{margin-left:auto;margin-top:18px;width:min(100%,340px)}.total div{display:flex;justify-content:space-between;padding:7px 0}.grand{font-size:20px;font-weight:800;color:#0a7d4f;border-top:2px solid #0a7d4f}.note{margin-top:24px;font-size:12px;color:#68756e}.print{position:fixed;right:18px;bottom:18px;border:0;border-radius:10px;background:#0a7d4f;color:white;font-weight:700;padding:12px 16px}@media print{.print{display:none}body{padding:0}}</style></head><body><div class="top"><div><div class="brand">DEVIS — FOREVER CIV</div><div class="muted">Simulation de produits Forever • Tarif '+escHtml(levelLabel(state.tier))+'</div></div><div class="muted" style="text-align:right">Réf. '+quoteNumber()+'<br>'+escHtml(date)+'</div></div>'+(client||phone?'<div class="box"><strong>Client</strong><div class="grid"><div>'+escHtml(client||'—')+'</div><div>'+escHtml(phone||'')+'</div></div></div>':'')+'<table><thead><tr><th>Réf.</th><th>Produit</th><th class="num">Qté</th><th class="num">Prix unitaire</th><th class="num">Montant</th></tr></thead><tbody>'+rows+'</tbody></table><div class="total"><div><span>Articles</span><strong>'+t.count+'</strong></div><div><span>Total CC</span><strong>'+escHtml(fmtcc(t.cc))+'</strong></div><div class="grand"><span>Total</span><span>'+escHtml(fmt(t.amount))+'</span></div></div>'+(note?'<div class="box"><strong>Observation</strong><div class="muted" style="margin-top:6px">'+escHtml(note).replace(/\n/g,'<br>')+'</div></div>':'')+'<div class="note">Document de simulation établi à partir de la grille tarifaire CIV intégrée à l’application. Les disponibilités et conditions commerciales peuvent être confirmées au moment de la commande.</div><button class="print" onclick="window.print()">Imprimer / Enregistrer en PDF</button></body></html>';}
+function openQuoteModal(){if(totals().count<=0){toast('Le panier est vide');return;}el('quoteModal').style.display='flex';setTimeout(function(){el('quoteClient').focus();},80);}
+function closeQuoteModal(){el('quoteModal').style.display='none';}
+function generateQuote(){var w=window.open('','_blank');if(!w){toast('Autorise les fenêtres surgissantes pour ouvrir le devis');return;}w.document.open();w.document.write(quoteHtml(el('quoteClient').value,el('quotePhone').value,el('quoteNote').value));w.document.close();closeQuoteModal();}
 function recapText(){var lines=['SIMULATION FOREVER CIV — Tarif '+levelLabel(state.tier),''];for(var ref in state.cart){if(!Object.prototype.hasOwnProperty.call(state.cart,ref))continue;var q=state.cart[ref],p=product(ref);if(!p||q<=0)continue;var u=unit(p);lines.push(q+' × '+p.name+' = '+(u==null?'—':fmt(u*q))+' ('+fmtcc(p.cc*q)+' CC)');}var t=totals();lines.push('','TOTAL : '+fmt(t.amount),'TOTAL CC : '+fmtcc(t.cc));return lines.join('\n');}
 function showRecap(){var ta=el('shareText');ta.value=recapText();ta.style.display='block';ta.focus();}
 function fallbackCopy(text){var ta=el('shareText');ta.value=text;ta.style.display='block';ta.focus();ta.select();try{var ok=document.execCommand('copy');toast(ok?'Récapitulatif copié':'Sélectionne le texte puis copie-le');}catch(e){toast('Sélectionne le texte puis copie-le');}}
@@ -179,8 +253,8 @@ function isStandalone(){return window.matchMedia&&window.matchMedia('(display-mo
 function openInstallHelp(){var help=el('installHelp');if(isStandalone()){help.innerHTML='<p>L’application est déjà ouverte en mode installé.</p>';}else if(isIOS()){help.innerHTML='<p><strong>iPhone / iPad :</strong> ouvre cette page dans Safari, touche <strong>Partager</strong>, puis <strong>Sur l’écran d’accueil</strong>. Active <strong>Ouvrir comme app web</strong>, puis touche <strong>Ajouter</strong>.</p>';}else{help.innerHTML='<p><strong>Android :</strong> dans Chrome, ouvre le menu ⋮ puis choisis <strong>Installer l’application</strong> ou <strong>Installer et créer un raccourci</strong>.</p>';}el('installModal').style.display='flex';}
 function setupInstall(){window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();deferredInstallPrompt=e;});el('installBtn').addEventListener('click',function(){if(deferredInstallPrompt){deferredInstallPrompt.prompt();deferredInstallPrompt.userChoice.then(function(){deferredInstallPrompt=null;});}else{openInstallHelp();}});el('closeModal').addEventListener('click',function(){el('installModal').style.display='none';});el('installModal').addEventListener('click',function(e){if(e.target===el('installModal'))el('installModal').style.display='none';});}
 function registerSW(){if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('./sw.js').catch(function(){});});}}
-function renderAll(){renderTiers();renderResults();renderCart();renderSummary();}
-function init(){load();bindTierButtons();el('search').addEventListener('input',renderResults);el('clear').addEventListener('click',function(){if(totals().count>0&&!window.confirm('Vider entièrement le panier ?'))return;state.cart={};save();renderCart();renderSummary();});el('print').addEventListener('click',function(){window.print();});el('recap').addEventListener('click',showRecap);el('copy').addEventListener('click',copyRecap);el('share').addEventListener('click',shareRecap);window.addEventListener('online',updateNetwork);window.addEventListener('offline',updateNetwork);updateNetwork();setupInstall();renderAll();registerSW();}
+function renderAll(){renderTiers();renderResults();renderCart();renderSummary();renderSavedSimulations();}
+function init(){load();loadSavedSimulations();bindTierButtons();el('search').addEventListener('input',renderResults);el('clear').addEventListener('click',function(){if(totals().count>0&&!window.confirm('Vider entièrement le panier ?'))return;state.cart={};save();renderCart();renderSummary();});el('print').addEventListener('click',function(){window.print();});el('recap').addEventListener('click',showRecap);el('copy').addEventListener('click',copyRecap);el('share').addEventListener('click',shareRecap);el('whatsapp').addEventListener('click',shareWhatsApp);el('quote').addEventListener('click',openQuoteModal);el('saveSimulation').addEventListener('click',saveCurrentSimulation);el('newSimulation').addEventListener('click',newSimulation);el('closeQuote').addEventListener('click',closeQuoteModal);el('generateQuote').addEventListener('click',generateQuote);el('quoteModal').addEventListener('click',function(e){if(e.target===el('quoteModal'))closeQuoteModal();});window.addEventListener('online',updateNetwork);window.addEventListener('offline',updateNetwork);updateNetwork();setupInstall();renderAll();renderSavedSimulations();registerSW();}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 </script>

@@ -1,7 +1,7 @@
 {
   "name": "Simulateur Forever CIV",
   "short_name": "Forever CIV",
-  "description": "Simulation mobile des prix Forever CIV par tarif Vente, PC, AA, A, MA et M, avec total CC.",
+  "description": "Simulation mobile des prix Forever CIV avec simulations sauvegardées, devis PDF, partage WhatsApp et total CC.",
   "lang": "fr",
   "dir": "ltr",
   "start_url": "./",
